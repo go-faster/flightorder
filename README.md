@@ -43,7 +43,7 @@ func processInput(input []int) (processing, output []int) {
 
 	wg.Add(len(input))
 	for _, v := range input {
-		ticket := route.TakeTicket()
+		ticket := route.Ticket()
 		go func(t *flightorder.Ticket, v int) {
 			defer wg.Done()
 			time.Sleep(time.Millisecond * time.Duration(rand.Intn(100)))
@@ -52,11 +52,15 @@ func processInput(input []int) (processing, output []int) {
 			processing = append(processing, v)
 			mux.Unlock()
 
-			_ = route.CompleteTicket(context.TODO(), t)
-
-			mux.Lock()
-			output = append(output, v)
-			mux.Unlock()
+			_ = route.CompleteTicket(context.TODO(), flightorder.CompleteTicketParams{
+				Ticket: t,
+				Completion: func(ctx context.Context) error {
+					mux.Lock()
+					output = append(output, v)
+					mux.Unlock()
+					return nil
+				},
+			})
 		}(ticket, v)
 	}
 

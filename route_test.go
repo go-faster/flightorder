@@ -16,8 +16,8 @@ func TestRoute(t *testing.T) {
 			TicketAllocator: alloc,
 		})
 
-		t1 := route.TakeTicket()
-		require.NoError(t, route.CompleteTicket(context.TODO(), t1))
+		t1 := route.Ticket()
+		require.NoError(t, route.CompleteTicket(context.TODO(), CompleteTicketParams{Ticket: t1}))
 		require.Nil(t, route.last)
 		require.Equal(t, []*Ticket{t1}, alloc.released)
 	})
@@ -28,10 +28,10 @@ func TestRoute(t *testing.T) {
 			TicketAllocator: alloc,
 		})
 
-		t1 := route.TakeTicket()
-		t2 := route.TakeTicket()
-		require.NoError(t, route.CompleteTicket(context.TODO(), t1))
-		require.NoError(t, route.CompleteTicket(context.TODO(), t2))
+		t1 := route.Ticket()
+		t2 := route.Ticket()
+		require.NoError(t, route.CompleteTicket(context.TODO(), CompleteTicketParams{Ticket: t1}))
+		require.NoError(t, route.CompleteTicket(context.TODO(), CompleteTicketParams{Ticket: t2}))
 		require.Nil(t, route.last)
 		require.Equal(t, []*Ticket{t1, t2}, alloc.released)
 	})
@@ -45,27 +45,27 @@ func TestRoute(t *testing.T) {
 		rec := newRecorder()
 		route.recorder = rec
 
-		t1 := route.TakeTicket()
-		t2 := route.TakeTicket()
-		t3 := route.TakeTicket()
+		t1 := route.Ticket()
+		t2 := route.Ticket()
+		t3 := route.Ticket()
 
 		var wg sync.WaitGroup
 		wg.Add(3)
 		go func() {
 			time.Sleep(time.Millisecond * 10)
-			require.NoError(t, route.CompleteTicket(context.TODO(), t3))
+			require.NoError(t, route.CompleteTicket(context.TODO(), CompleteTicketParams{Ticket: t3}))
 			wg.Done()
 		}()
 
 		go func() {
 			time.Sleep(time.Millisecond * 20)
-			require.NoError(t, route.CompleteTicket(context.TODO(), t2))
+			require.NoError(t, route.CompleteTicket(context.TODO(), CompleteTicketParams{Ticket: t2}))
 			wg.Done()
 		}()
 
 		go func() {
 			time.Sleep(time.Millisecond * 30)
-			require.NoError(t, route.CompleteTicket(context.TODO(), t1))
+			require.NoError(t, route.CompleteTicket(context.TODO(), CompleteTicketParams{Ticket: t1}))
 			wg.Done()
 		}()
 
@@ -85,27 +85,27 @@ func TestRoute(t *testing.T) {
 		rec := newRecorder()
 		route.recorder = rec
 
-		t1 := route.TakeTicket()
-		t2 := route.TakeTicket()
-		t3 := route.TakeTicket()
+		t1 := route.Ticket()
+		t2 := route.Ticket()
+		t3 := route.Ticket()
 
 		var wg sync.WaitGroup
 		wg.Add(3)
 		go func() {
 			time.Sleep(time.Millisecond * 10)
-			require.NoError(t, route.CompleteTicket(context.TODO(), t2))
+			require.NoError(t, route.CompleteTicket(context.TODO(), CompleteTicketParams{Ticket: t2}))
 			wg.Done()
 		}()
 
 		go func() {
 			time.Sleep(time.Millisecond * 20)
-			require.NoError(t, route.CompleteTicket(context.TODO(), t3))
+			require.NoError(t, route.CompleteTicket(context.TODO(), CompleteTicketParams{Ticket: t3}))
 			wg.Done()
 		}()
 
 		go func() {
 			time.Sleep(time.Millisecond * 30)
-			require.NoError(t, route.CompleteTicket(context.TODO(), t1))
+			require.NoError(t, route.CompleteTicket(context.TODO(), CompleteTicketParams{Ticket: t1}))
 			wg.Done()
 		}()
 
@@ -123,14 +123,14 @@ func BenchmarkRoute(b *testing.B) {
 		route := NewRoute(RouteParams{})
 		for i := 0; i < b.N; i++ {
 			var (
-				t1 = route.TakeTicket()
-				t2 = route.TakeTicket()
-				t3 = route.TakeTicket()
+				t1 = route.Ticket()
+				t2 = route.Ticket()
+				t3 = route.Ticket()
 			)
 
-			require.NoError(b, route.CompleteTicket(ctx, t1))
-			require.NoError(b, route.CompleteTicket(ctx, t2))
-			require.NoError(b, route.CompleteTicket(ctx, t3))
+			require.NoError(b, route.CompleteTicket(ctx, CompleteTicketParams{Ticket: t1}))
+			require.NoError(b, route.CompleteTicket(ctx, CompleteTicketParams{Ticket: t2}))
+			require.NoError(b, route.CompleteTicket(ctx, CompleteTicketParams{Ticket: t3}))
 		}
 	})
 
@@ -140,14 +140,14 @@ func BenchmarkRoute(b *testing.B) {
 		})
 		for i := 0; i < b.N; i++ {
 			var (
-				t1 = route.TakeTicket()
-				t2 = route.TakeTicket()
-				t3 = route.TakeTicket()
+				t1 = route.Ticket()
+				t2 = route.Ticket()
+				t3 = route.Ticket()
 			)
 
-			require.NoError(b, route.CompleteTicket(ctx, t1))
-			require.NoError(b, route.CompleteTicket(ctx, t2))
-			require.NoError(b, route.CompleteTicket(ctx, t3))
+			require.NoError(b, route.CompleteTicket(ctx, CompleteTicketParams{Ticket: t1}))
+			require.NoError(b, route.CompleteTicket(ctx, CompleteTicketParams{Ticket: t2}))
+			require.NoError(b, route.CompleteTicket(ctx, CompleteTicketParams{Ticket: t3}))
 		}
 	})
 }

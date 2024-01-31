@@ -32,8 +32,8 @@ func NewRoute(params RouteParams) *Route {
 	}
 }
 
-// TakeTicket takes a new ticket.
-func (r *Route) TakeTicket() *Ticket {
+// Ticket takes a new ticket.
+func (r *Route) Ticket() *Ticket {
 	r.mux.Lock()
 	defer r.mux.Unlock()
 
@@ -48,15 +48,28 @@ func (r *Route) TakeTicket() *Ticket {
 	return ticket
 }
 
+// CompleteTicketParams is a parameters for CompleteTicket method.
+type CompleteTicketParams struct {
+	// Ticket to complete.
+	Ticket *Ticket
+	// Completion function, will be called in order tickets are taken. Optional.
+	Completion func(ctx context.Context) error
+}
+
 // CompleteTicket completes a ticket.
 // Waits for previous taken tickets to complete first, if any.
-func (r *Route) CompleteTicket(ctx context.Context, t *Ticket) error {
+func (r *Route) CompleteTicket(ctx context.Context, params CompleteTicketParams) error {
+	if params.Completion == nil {
+		params.Completion = func(ctx context.Context) error { return nil }
+	}
+
+	t := params.Ticket
 	if r.recorder != nil {
 		r.recorder.completeCall(t)
 	}
 
 	if t.prev == nil {
-		return r.completeTail(t)
+		return r.completeTail(ctx, t, params.Completion)
 	}
 
 	if err := r.waitFor(ctx, t.prev); err != nil {
@@ -66,10 +79,10 @@ func (r *Route) CompleteTicket(ctx context.Context, t *Ticket) error {
 	r.allocator.ReleaseTicket(t.prev)
 	t.prev = nil
 
-	return r.completeTail(t)
+	return r.completeTail(ctx, t, params.Completion)
 }
 
-func (r *Route) completeTail(t *Ticket) error {
+func (r *Route) completeTail(ctx context.Context, t *Ticket, f func(ctx context.Context) error) error {
 	r.mux.Lock()
 	defer r.mux.Unlock()
 
@@ -81,7 +94,11 @@ func (r *Route) completeTail(t *Ticket) error {
 			r.recorder.recordCompleted(t)
 		}
 
-		return nil
+		return f(ctx)
+	}
+
+	if err := f(ctx); err != nil {
+		return err
 	}
 
 	// There is a ticket ahead.
