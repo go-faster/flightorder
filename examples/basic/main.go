@@ -25,12 +25,9 @@ func main() {
 		defer wg.Done()
 		time.Sleep(time.Millisecond * 20)
 		fmt.Println("Task 1 started")
-		route.CompleteTicket(context.TODO(), flightorder.CompleteTicketParams{
-			Ticket: t1,
-			Completion: func(ctx context.Context) error {
-				fmt.Println("Task 1 completed")
-				return nil
-			},
+		route.CompleteTicket(context.TODO(), t1, func(ctx context.Context) error {
+			fmt.Println("Task 1 completed")
+			return nil
 		})
 	}()
 
@@ -38,12 +35,9 @@ func main() {
 		defer wg.Done()
 		time.Sleep(time.Millisecond * 30)
 		fmt.Println("Task 2 started")
-		route.CompleteTicket(context.TODO(), flightorder.CompleteTicketParams{
-			Ticket: t2,
-			Completion: func(ctx context.Context) error {
-				fmt.Println("Task 2 completed")
-				return nil
-			},
+		route.CompleteTicket(context.TODO(), t2, func(ctx context.Context) error {
+			fmt.Println("Task 2 completed")
+			return nil
 		})
 	}()
 
@@ -51,12 +45,9 @@ func main() {
 		defer wg.Done()
 		time.Sleep(time.Millisecond * 10)
 		fmt.Println("Task 3 started")
-		route.CompleteTicket(context.TODO(), flightorder.CompleteTicketParams{
-			Ticket: t3,
-			Completion: func(ctx context.Context) error {
-				fmt.Println("Task 3 completed")
-				return nil
-			},
+		route.CompleteTicket(context.TODO(), t3, func(ctx context.Context) error {
+			fmt.Println("Task 3 completed")
+			return nil
 		})
 	}()
 

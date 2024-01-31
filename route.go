@@ -48,28 +48,20 @@ func (r *Route) Ticket() *Ticket {
 	return ticket
 }
 
-// CompleteTicketParams is a parameters for CompleteTicket method.
-type CompleteTicketParams struct {
-	// Ticket to complete.
-	Ticket *Ticket
-	// Completion function, will be called in order tickets are taken. Optional.
-	Completion func(ctx context.Context) error
-}
-
 // CompleteTicket completes a ticket.
 // Waits for previous taken tickets to complete first, if any.
-func (r *Route) CompleteTicket(ctx context.Context, params CompleteTicketParams) error {
-	if params.Completion == nil {
-		params.Completion = func(ctx context.Context) error { return nil }
+// Completion function is optional.
+func (r *Route) CompleteTicket(ctx context.Context, t *Ticket, completion func(ctx context.Context) error) error {
+	if completion == nil {
+		completion = func(ctx context.Context) error { return nil }
 	}
 
-	t := params.Ticket
 	if r.recorder != nil {
 		r.recorder.completeCall(t)
 	}
 
 	if t.prev == nil {
-		return r.completeTail(ctx, t, params.Completion)
+		return r.completeTail(ctx, t, completion)
 	}
 
 	if err := r.waitFor(ctx, t.prev); err != nil {
@@ -79,7 +71,7 @@ func (r *Route) CompleteTicket(ctx context.Context, params CompleteTicketParams)
 	r.allocator.ReleaseTicket(t.prev)
 	t.prev = nil
 
-	return r.completeTail(ctx, t, params.Completion)
+	return r.completeTail(ctx, t, completion)
 }
 
 func (r *Route) completeTail(ctx context.Context, t *Ticket, f func(ctx context.Context) error) error {

@@ -17,7 +17,7 @@ func TestRoute(t *testing.T) {
 		})
 
 		t1 := route.Ticket()
-		require.NoError(t, route.CompleteTicket(context.TODO(), CompleteTicketParams{Ticket: t1}))
+		require.NoError(t, route.CompleteTicket(context.TODO(), t1, nil))
 		require.Nil(t, route.last)
 		require.Equal(t, []*Ticket{t1}, alloc.released)
 	})
@@ -30,8 +30,8 @@ func TestRoute(t *testing.T) {
 
 		t1 := route.Ticket()
 		t2 := route.Ticket()
-		require.NoError(t, route.CompleteTicket(context.TODO(), CompleteTicketParams{Ticket: t1}))
-		require.NoError(t, route.CompleteTicket(context.TODO(), CompleteTicketParams{Ticket: t2}))
+		require.NoError(t, route.CompleteTicket(context.TODO(), t1, nil))
+		require.NoError(t, route.CompleteTicket(context.TODO(), t2, nil))
 		require.Nil(t, route.last)
 		require.Equal(t, []*Ticket{t1, t2}, alloc.released)
 	})
@@ -53,19 +53,19 @@ func TestRoute(t *testing.T) {
 		wg.Add(3)
 		go func() {
 			time.Sleep(time.Millisecond * 10)
-			require.NoError(t, route.CompleteTicket(context.TODO(), CompleteTicketParams{Ticket: t3}))
+			require.NoError(t, route.CompleteTicket(context.TODO(), t3, nil))
 			wg.Done()
 		}()
 
 		go func() {
 			time.Sleep(time.Millisecond * 20)
-			require.NoError(t, route.CompleteTicket(context.TODO(), CompleteTicketParams{Ticket: t2}))
+			require.NoError(t, route.CompleteTicket(context.TODO(), t2, nil))
 			wg.Done()
 		}()
 
 		go func() {
 			time.Sleep(time.Millisecond * 30)
-			require.NoError(t, route.CompleteTicket(context.TODO(), CompleteTicketParams{Ticket: t1}))
+			require.NoError(t, route.CompleteTicket(context.TODO(), t1, nil))
 			wg.Done()
 		}()
 
@@ -93,19 +93,19 @@ func TestRoute(t *testing.T) {
 		wg.Add(3)
 		go func() {
 			time.Sleep(time.Millisecond * 10)
-			require.NoError(t, route.CompleteTicket(context.TODO(), CompleteTicketParams{Ticket: t2}))
+			require.NoError(t, route.CompleteTicket(context.TODO(), t2, nil))
 			wg.Done()
 		}()
 
 		go func() {
 			time.Sleep(time.Millisecond * 20)
-			require.NoError(t, route.CompleteTicket(context.TODO(), CompleteTicketParams{Ticket: t3}))
+			require.NoError(t, route.CompleteTicket(context.TODO(), t3, nil))
 			wg.Done()
 		}()
 
 		go func() {
 			time.Sleep(time.Millisecond * 30)
-			require.NoError(t, route.CompleteTicket(context.TODO(), CompleteTicketParams{Ticket: t1}))
+			require.NoError(t, route.CompleteTicket(context.TODO(), t1, nil))
 			wg.Done()
 		}()
 
@@ -128,9 +128,9 @@ func BenchmarkRoute(b *testing.B) {
 				t3 = route.Ticket()
 			)
 
-			require.NoError(b, route.CompleteTicket(ctx, CompleteTicketParams{Ticket: t1}))
-			require.NoError(b, route.CompleteTicket(ctx, CompleteTicketParams{Ticket: t2}))
-			require.NoError(b, route.CompleteTicket(ctx, CompleteTicketParams{Ticket: t3}))
+			require.NoError(b, route.CompleteTicket(ctx, t1, nil))
+			require.NoError(b, route.CompleteTicket(ctx, t2, nil))
+			require.NoError(b, route.CompleteTicket(ctx, t3, nil))
 		}
 	})
 
@@ -145,9 +145,9 @@ func BenchmarkRoute(b *testing.B) {
 				t3 = route.Ticket()
 			)
 
-			require.NoError(b, route.CompleteTicket(ctx, CompleteTicketParams{Ticket: t1}))
-			require.NoError(b, route.CompleteTicket(ctx, CompleteTicketParams{Ticket: t2}))
-			require.NoError(b, route.CompleteTicket(ctx, CompleteTicketParams{Ticket: t3}))
+			require.NoError(b, route.CompleteTicket(ctx, t1, nil))
+			require.NoError(b, route.CompleteTicket(ctx, t2, nil))
+			require.NoError(b, route.CompleteTicket(ctx, t3, nil))
 		}
 	})
 }

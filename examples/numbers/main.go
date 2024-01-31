@@ -37,14 +37,11 @@ func processInput(input []int) (processing, output []int) {
 			processing = append(processing, v)
 			mux.Unlock()
 
-			_ = route.CompleteTicket(context.TODO(), flightorder.CompleteTicketParams{
-				Ticket: t,
-				Completion: func(ctx context.Context) error {
-					mux.Lock()
-					output = append(output, v)
-					mux.Unlock()
-					return nil
-				},
+			_ = route.CompleteTicket(context.TODO(), t, func(ctx context.Context) error {
+				mux.Lock()
+				output = append(output, v)
+				mux.Unlock()
+				return nil
 			})
 		}(ticket, v)
 	}
