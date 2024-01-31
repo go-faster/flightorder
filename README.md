@@ -4,12 +4,6 @@ This package allows to do _[ordered input] -> [parallel processing] -> [ordered 
 
 The name was inspired by [golang.org/x/sync/singleflight](https://pkg.go.dev/golang.org/x/sync/singleflight) package.
 
-## Motivation
-
-Sending logs from a single file to multiple kafka brokers concurrently while preserving at-least-once delivery guarantees:
-* Logs are sent to multiple kafka brokers in parallel to enhance throughput.
-* File offsets are committed in the exact order they are read to ensure at-least-once delivery guarantees and prevent data loss in case of shipper or broker failures.
-
 ## Installation
 
 ```
@@ -77,6 +71,12 @@ input:     [1 2 3 4 5 6 7 8 9]
 processed: [3 1 9 7 6 2 5 4 8]
 output:    [1 2 3 4 5 6 7 8 9]
 ```
+
+## Motivation
+
+Sending logs from a single file to multiple kafka brokers concurrently while preserving at-least-once delivery guarantees:
+* Logs are sent to multiple kafka brokers in parallel to enhance throughput.
+* File offsets are committed in the exact order they are read to ensure at-least-once delivery guarantees and prevent data loss in case of shipper or broker failures.
 
 ## License
 
