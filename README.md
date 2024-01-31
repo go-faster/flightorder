@@ -1,4 +1,4 @@
-# flightorder
+# flightorder [![GoDoc](https://godoc.org/github.com/go-faster/flightorder?status.svg)](https://godoc.org/github.com/go-faster/flightorder)
 
 This package allows to do _[ordered input] -> [parallel processing] -> [ordered output]_ in a streaming manner.
 
