@@ -20,7 +20,7 @@ jobs:
           # - windows-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v4.3.0
 
       - name: Install Go
         uses: actions/setup-go@v5.5.0
